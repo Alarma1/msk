@@ -8,13 +8,9 @@ export default new Vuex.Store({
     controllOne: 0,
     controllTwo: 0,
     controllTree: 0,
-    controllSum: null,
+    controllSum: 0,
   },
-  getters: {
-    controllSum(state) {
-      state.controllSum = state.controllTwo + state.controllTree;
-    },
-  },
+
   mutations: {
     updateStateControllOne(state, value) {
       state.controllOne = value;
@@ -23,6 +19,9 @@ export default new Vuex.Store({
     updateStateControllOther(state, value) {
       state.controllTwo = value;
       state.controllTree = value;
+    },
+    controllSum(state) {
+      state.controllSum = state.controllTwo + state.controllTree;
     },
   },
 });

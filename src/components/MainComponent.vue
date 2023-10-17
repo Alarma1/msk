@@ -4,24 +4,31 @@
 <template>
   <div class="main-box">
     <div class="container">
-      <div>
-        <p class="text">Контролл 1</p>
-        <div>
+      <div class="container-group">
+        <div class="group-elem">
+          <p class="text">Контролл 1</p>
+          <input class="input_style hover-effect" name="Котролл 1" type="number" min="0" step="1"
+                 @input="updateControllOne"
+                 v-model.number="controllOne">
+          <button class="btn" @click="totalSum" v-if="controllOther != 0">Сумма</button>
         </div>
-        <input class="input_style hover-effect" name="Котролл 1" type="number" min="0" step="1" @input="updateControllOne"
-               v-model.number="controllOne">
-        <button class="btn" @click="totalSum" v-if="controllOther != 0" >Сумма</button>
+
+        <div class="group-elem">
+          <p class="text">Контролл 2</p>
+          <input class="input_style" name="Котролл 1" type="number" min="0"
+                 @input="updateControllOther"
+                 v-model.number="controllOther">
+          <button class="btn" @click="constantBtn">Константа</button>
+        </div>
+
+        <div class="group-elem">
+          <p class="text">Контролл 3</p>
+          <input class="input_style" name="Котролл 1" type="number" min="0"
+                 @input="updateControllOther"
+                 v-model.number="controllOther">
+        </div>
       </div>
 
-      <div><p class="text">Контролл 2</p></div>
-      <div><input class="input_style" name="Котролл 1" type="number" min="0" @input="updateControllOther"
-                  v-model.number="controllOther">
-        <button class="btn" @click="constantBtn">Константа</button>
-      </div>
-
-      <div><p class="text">Контролл 3</p></div>
-      <div><input class="input_style" name="Котролл 1" type="number" min="0" @input="updateControllOther"
-                  v-model.number="controllOther"></div>
     </div>
   </div>
 </template>
@@ -52,6 +59,7 @@ export default {
       this.$store.commit('updateStateControllOther', this.controllOther);
     },
     totalSum() {
+      this.$store.commit('controllSum');
       this.controllOne = this.$store.state.controllSum;
     },
     constantBtn() {
@@ -63,28 +71,43 @@ export default {
 </script>
 
 <style scoped>
+  body {
+    background-color: black
+  }
   .main-box {
     display: flex;
-    width: 540px;
-    height: 640px;
-    margin: auto;
+    justify-content: center;
+    width: 1920px;
+    height: 700px;
+    background-color: black;
+    padding-top: 50px;
   }
 
   .container {
-    width: 263px;
-    height: 29px;
+    background-color: white;
+    width: 540px;
+    height: 640px;
+  }
+
+  .container-group {
+    margin-top: 243px;
+    margin-left: 188px;
+  }
+
+  .group-elem {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 36px;
   }
 
   .text {
     width: 83px;
     height: 21px;
-    margin-right: 50px;
+    margin-right: 60px;
     font-family: Open sans-serif;
     font-size: 15px;
     font-weight: 400;
     line-height: 20px;
-    letter-spacing: 0em;
-    text-align: left;
     color: #767C82;
   }
 
@@ -92,16 +115,22 @@ export default {
     border: none;
     width: 130px;
     height: 29px;
+    color: #0F1011;
+  ;
   }
+
   .input_style:focus {
-    border: 1px #DDDDDD solid ;
+    border: 1px #DDDDDD solid;
   }
+
   .input_style:hover {
     color: #00467F;
   }
+
   .btn {
     color: #0070CD;
     background: none;
     border: none;
+    padding: unset;
   }
 </style>
