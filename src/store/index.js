@@ -14,7 +14,7 @@ export default new Vuex.Store({
   mutations: {
     updateStateControllOne(state, value) {
       state.controllOne = value;
-      console.log(this.state.controllOne);
+      console.log(state.controllOne);
     },
     updateStateControllOther(state, value) {
       state.controllTwo = value;

@@ -2,30 +2,30 @@
 <!-- eslint-disable max-len -->
 <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
 <template>
-  <div class="main-box">
+  <div class="main-box" ref="reset">
     <div class="container">
       <div class="container-group">
         <div class="group-elem">
           <p class="text">Контролл 1</p>
-          <input class="input_style hover-effect" name="Котролл 1" type="number" min="0" step="1"
+          <input class="input_style hover-effect" name="Контролл 1" type="number" min="0" step="1"
                  @input="updateControllOne"
-                 v-model.number="controllOne">
+                 v-model.number="controllOne" @keyup="keydown" onfocus="this.select()">
           <button class="btn" @click="totalSum" v-if="controllOther != 0">Сумма</button>
         </div>
 
         <div class="group-elem">
           <p class="text">Контролл 2</p>
-          <input class="input_style" name="Котролл 1" type="number" min="0"
+          <input class="input_style" name="Контролл 2" type="number" min="0"
                  @input="updateControllOther"
-                 v-model.number="controllOther">
+                 v-model.number="controllOther" @keyup="keydown" onfocus="this.select()">
           <button class="btn" @click="constantBtn">Константа</button>
         </div>
 
         <div class="group-elem">
           <p class="text">Контролл 3</p>
-          <input class="input_style" name="Котролл 1" type="number" min="0"
+          <input class="input_style" name="Контролл 3" type="number" min="0"
                  @input="updateControllOther"
-                 v-model.number="controllOther">
+                 v-model.number="controllOther" @keyup="keydown" onfocus="this.select()">
         </div>
       </div>
 
@@ -43,16 +43,16 @@ export default {
     };
   },
   methods: {
-    updateControllOne(event) {
-      const { value } = event.target;
+    updateControllOne(input) {
+      const { value } = input.target;
+      console.log(value.includes('+'));
       if (value.includes('.') || value.includes('-')) {
         this.controllOne = 0;
       }
       this.$store.commit('updateStateControllOne', this.controllOne);
-      console.log(this.controllOne);
     },
-    updateControllOther(event) {
-      const { value } = event.target;
+    updateControllOther(input) {
+      const { value } = input.target;
       if (value.includes('.') || value.includes('-')) {
         this.controllOther = 0;
       }
@@ -65,6 +65,24 @@ export default {
     constantBtn() {
       this.controllOther = 1000;
       this.$store.commit('updateStateControllOther', this.controllOther);
+    },
+    keydown(event) {
+      if ((event.code === 'Enter' || event.code === 'NumpadEnter') && event.target.name === 'Контролл 1') {
+        this.controllOne = event.target.value;
+        event.target.blur();
+      }
+      if ((event.code === 'Escape') && event.target.name === 'Контролл 1') {
+        this.controllOne = '';
+        event.target.blur();
+      }
+      if ((event.code === 'Enter' || event.code === 'NumpadEnter') && (event.target.name === 'Контролл 2' || event.target.name === 'Контролл 3')) {
+        this.controllOther = event.target.value;
+        event.target.blur();
+      }
+      if (event.code === 'Escape' && (event.target.name === 'Контролл 2' || event.target.name === 'Контролл 3')) {
+        this.controllOther = '';
+        event.target.blur();
+      }
     },
   },
 };
@@ -112,6 +130,7 @@ export default {
   }
 
   .input_style {
+    font-size: 15px;
     border: none;
     width: 130px;
     height: 29px;
