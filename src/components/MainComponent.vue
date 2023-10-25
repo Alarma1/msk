@@ -2,18 +2,23 @@
 <!-- eslint-disable max-len -->
 <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
 <template>
-  <div class="main-box" ref="reset">
+  <div class="main-box">
     <div class="container">
       <div class="container-group">
         <div class="group-elem">
           <p class="text">Контролл 1</p>
-          <input class="input_style hover-effect" name="Контролл 1" type="number" min="0" step="1"
-                 @input="updateControllOne"
-                 v-model.number="controllOne" @keyup="keydown" onfocus="this.select()"
-                 @focus="focusOn = true">
-          <button class="btn" @click="totalSum" v-if="controllOther != 0">Сумма</button>
-          <div class="svg" :class="{ svgNone: focusOn }">
-            <svg width="6" height="6" viewBox="0 0 6 6" fill="none"
+          <div v-show="focusOn.focusControlOne">
+            <input class="input_style hover-effect" ref="inControlOne" name="Контролл 1"
+                   type="number" min="0" step="1"
+                   @input="updateControlOne"
+                   v-model.number="controlOne" @keyup="keydown"
+                   @blur="activeBlur('inControlOne','btnSum')">
+          </div>
+          <button class="btn" ref="btnSum" @click="totalSum" v-if="focusOn.focusControlOne">Сумма</button>
+          <div class="unfocus-form" @keydown="unfocusForm" @click="unfocusForm('inControlOne')"
+               v-if="!focusOn.focusControlOne">
+            <p class="unfocus-text">{{ this.controlOne | numberFormat }}</p>
+            <svg class="unfocus-svg" width="6" height="6" viewBox="0 0 6 6" fill="none"
                  xmlns="http://www.w3.org/2000/svg">
               <g clip-path="url(#clip0_2_85)">
                 <path
@@ -31,12 +36,18 @@
 
         <div class="group-elem">
           <p class="text">Контролл 2</p>
-          <input class="input_style" name="Контролл 2" type="number" min="0"
-                 @input="updateControllOther"
-                 v-model.number="controllOther" @keyup="keydown" onfocus="this.select()">
-          <button class="btn" @click="constantBtn">Константа</button>
-          <div class="svg">
-            <svg width="6" height="6" viewBox="0 0 6 6" fill="none"
+          <div v-show="focusOn.focusControlTwo">
+            <input class="input_style" ref="inControlTwo" name="Контролл 2" type="number" min="0"
+                   @input="updateControlOther"
+                   v-model.number="controlOther" @keyup="keydown"
+                   @blur="focusOn.focusControlTwo = false">
+          </div>
+          <button class="btn" @click="constantBtn" v-if="focusOn.focusControlTwo">Константа
+          </button>
+          <div class="unfocus-form" @keydown="unfocusForm" @click="unfocusForm('inControlTwo')"
+               v-if="!focusOn.focusControlTwo">
+            <p class="unfocus-text">{{ this.controlOther | numberFormat }}</p>
+            <svg class="unfocus-svg" width="6" height="6" viewBox="0 0 6 6" fill="none"
                  xmlns="http://www.w3.org/2000/svg">
               <g clip-path="url(#clip0_2_85)">
                 <path
@@ -52,14 +63,19 @@
           </div>
           <div class="btn-focus"></div>
         </div>
-
         <div class="group-elem">
           <p class="text">Контролл 3</p>
-          <input class="input_style" name="Контролл 3" type="number" min="0"
-                 @input="updateControllOther"
-                 v-model.number="controllOther" @keyup="keydown" onfocus="this.select()">
-          <div class="svg">
-            <svg width="6" height="6" viewBox="0 0 6 6" fill="none"
+          <div v-show="focusOn.focusControlTree">
+            <input class="input_style" ref="inControlTree" name="Контролл 3" type="number" min="0"
+                   @input="updateControlOther"
+                   v-model.number="controlOther" @keyup="keydown"
+                   @focus="focusOn.focusControlTree = true"
+                   @blur="focusOn.focusControlTree = false">
+          </div>
+          <div class="unfocus-form" @keydown="unfocusForm" @click="unfocusForm('inControlTree')"
+               v-if="!focusOn.focusControlTree">
+            <p class="unfocus-text">{{ this.controlOther | numberFormat }}</p>
+            <svg class="unfocus-svg" width="6" height="6" viewBox="0 0 6 6" fill="none"
                  xmlns="http://www.w3.org/2000/svg">
               <g clip-path="url(#clip0_2_85)">
                 <path
@@ -74,6 +90,7 @@
             </svg>
           </div>
         </div>
+
       </div>
 
     </div>
@@ -81,55 +98,94 @@
 </template>
 
 <script>
+import numberFormat from '@/helpers/numberFormat';
+
 export default {
+  filters: { numberFormat },
   data() {
     return {
-      controllOne: 0,
-      controllOther: 0,
-      controllSum: 0,
-      focusOn: false,
+      controlOne: 0,
+      controlOther: 0,
+      controlSum: 0,
+      focusOn: {
+        focusControlOne: false,
+        focusControlTwo: false,
+        focusControlTree: false,
+      },
+      blurOn: true,
     };
   },
   methods: {
-    updateControllOne(input) {
+    updateControlOne(input) {
       const { value } = input.target;
-      console.log(value.includes('+'));
       if (value.includes('.') || value.includes('-')) {
-        this.controllOne = 0;
+        this.controlOne = 0;
       }
-      this.$store.commit('updateStateControllOne', this.controllOne);
+      this.$store.commit('updateStateControlOne', this.controlOne);
     },
-    updateControllOther(input) {
+    updateControlOther(input) {
       const { value } = input.target;
       if (value.includes('.') || value.includes('-')) {
-        this.controllOther = 0;
+        this.controlOther = 0;
       }
-      this.$store.commit('updateStateControllOther', this.controllOther);
+      this.$store.commit('updateStateControlOther', this.controlOther);
     },
     totalSum() {
-      this.$store.commit('controllSum');
-      this.controllOne = this.$store.state.controllSum;
+      this.focusOn.focusControlOne = true;
+      this.$store.commit('controlSum');
+      this.controlOne = this.$store.state.controlSum;
     },
     constantBtn() {
-      this.controllOther = 1000;
-      this.$store.commit('updateStateControllOther', this.controllOther);
+      this.controlOther = 1000;
+      this.$store.commit('updateStateControlOther', this.controlOther);
     },
     keydown(event) {
       if ((event.code === 'Enter' || event.code === 'NumpadEnter') && event.target.name === 'Контролл 1') {
-        this.controllOne = event.target.value;
+        this.controlOne = event.target.value;
         event.target.blur();
       }
       if ((event.code === 'Escape') && event.target.name === 'Контролл 1') {
-        this.controllOne = '';
+        this.controlOne = 0;
         event.target.blur();
       }
       if ((event.code === 'Enter' || event.code === 'NumpadEnter') && (event.target.name === 'Контролл 2' || event.target.name === 'Контролл 3')) {
-        this.controllOther = event.target.value;
+        this.controlOther = event.target.value;
         event.target.blur();
       }
       if (event.code === 'Escape' && (event.target.name === 'Контролл 2' || event.target.name === 'Контролл 3')) {
-        this.controllOther = '';
+        this.controlOther = 0;
         event.target.blur();
+      }
+    },
+    unfocusForm(refData) {
+      if (refData === 'inControlOne') {
+        this.focusOn.focusControlOne = true;
+        this.$nextTick(() => {
+          this.$refs.inControlOne.focus();
+          this.$refs.inControlOne.select();
+        });
+      }
+      if (refData === 'inControlTwo') {
+        this.focusOn.focusControlTwo = true;
+        this.$nextTick(() => {
+          this.$refs.inControlTwo.focus();
+          this.$refs.inControlTwo.select();
+        });
+      }
+      if (refData === 'inControlTree') {
+        this.focusOn.focusControlTree = true;
+        this.$nextTick(() => {
+          this.$refs.inControlTree.focus();
+          this.$refs.inControlTree.select();
+        });
+      }
+    },
+    activeBlur(inElem, btnElem) {
+      console.log(inElem, btnElem, this.$refs.inControlOne);
+      console.log(inElem === 'inControlOne');
+      if (inElem === 'inControlOne') {
+        console.log('hello');
+        this.$refs.inControlOne.blur();
       }
     },
   },
@@ -157,25 +213,51 @@ export default {
   }
 
   .container-group {
-    margin-top: 243px;
+    height: 29px;
     margin-left: 188px;
+    margin-top: 243px;
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .group-elem {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     margin-bottom: 36px;
+    height: 29px;
+  }
+
+  .group-elem:not(:last-child) {
+    margin-right: 25px;
   }
 
   .text {
     width: 83px;
     height: 21px;
-    margin-right: 60px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-right: 50px;
     font-family: Open sans-serif;
     font-size: 15px;
     font-weight: 400;
-    line-height: 20px;
+    line-height: 20.43px;
     color: #767C82;
+  }
+
+  .unfocus-form {
+    cursor: pointer;
+    display: flex;
+    margin-left: 10px;
+  }
+
+  .unfocus-text {
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+
+  .unfocus-svg {
+    margin-top: 5px;
+    margin-left: 6px;
   }
 
   .number input[type="number"]::-webkit-outer-spin-button,
@@ -184,28 +266,12 @@ export default {
   }
 
   .input_style {
-    padding-left: 10px;
-    font-size: 15px;
-    /*border: none;*/
     width: 130px;
     height: 29px;
+    font-size: 15px;
+    padding-left: 10px;
+    border: 1px solid transparent;
     color: #0F1011;
-  }
-
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  .svg {
-    position: absolute;
-    margin-top: 14px;
-    margin-left: 167px;
-  }
-
-  .svgNone {
-    display: none;
   }
 
   .input_style:focus {
@@ -225,11 +291,12 @@ export default {
     line-height: 14px;
     letter-spacing: 0em;
     text-align: left;
-    margin-left: 148px;
-    margin-top: 40px;
+    margin-left: 145px;
+    margin-top: 42px;
     color: #0070CD;
     background: none;
     border: none;
     padding: unset;
+    cursor: pointer;
   }
 </style>

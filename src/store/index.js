@@ -5,23 +5,22 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    controllOne: 0,
-    controllTwo: 0,
-    controllTree: 0,
-    controllSum: 0,
+    controlOne: 0,
+    controlTwo: 0,
+    controlTree: 0,
+    controlSum: 0,
   },
 
   mutations: {
-    updateStateControllOne(state, value) {
-      state.controllOne = value;
-      console.log(state.controllOne);
+    updateStateControlOne(state, value) {
+      state.controlOne = value;
     },
-    updateStateControllOther(state, value) {
-      state.controllTwo = value;
-      state.controllTree = value;
+    updateStateControlOther(state, value) {
+      state.controlTwo = value;
+      state.controlTree = value;
     },
-    controllSum(state) {
-      state.controllSum = state.controllTwo + state.controllTree;
+    controlSum(state) {
+      state.controlSum = state.controlTwo + state.controlTree;
     },
   },
 });
