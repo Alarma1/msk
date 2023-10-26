@@ -12,9 +12,10 @@
                    type="number" min="0" step="1"
                    @input="updateControlOne"
                    v-model.number="controlOne" @keyup="keydown"
-                   @blur="activeBlur('inControlOne','btnSum')">
+                   @focus="focusOn.focusControlOne = true"
+            @blur="activeBlur('btnSum')">
           </div>
-          <button class="btn" ref="btnSum" @click="totalSum" v-if="focusOn.focusControlOne">Сумма</button>
+          <button class="btn" ref="btnSum" @mouseup="totalSum" v-if="focusOn.focusControlOne">Сумма</button>
           <div class="unfocus-form" @keydown="unfocusForm" @click="unfocusForm('inControlOne')"
                v-if="!focusOn.focusControlOne">
             <p class="unfocus-text">{{ this.controlOne | numberFormat }}</p>
@@ -112,6 +113,7 @@ export default {
         focusControlTwo: false,
         focusControlTree: false,
       },
+      btnClick: false,
       blurOn: true,
     };
   },
@@ -131,30 +133,35 @@ export default {
       this.$store.commit('updateStateControlOther', this.controlOther);
     },
     totalSum() {
-      this.focusOn.focusControlOne = true;
       this.$store.commit('controlSum');
       this.controlOne = this.$store.state.controlSum;
+      this.$refs.inControlOne.blur();
+      // this.focusOn.focusControlOne = false;
+      this.btnClick = true;
     },
     constantBtn() {
       this.controlOther = 1000;
       this.$store.commit('updateStateControlOther', this.controlOther);
     },
     keydown(event) {
+      console.log(event);
       if ((event.code === 'Enter' || event.code === 'NumpadEnter') && event.target.name === 'Контролл 1') {
         this.controlOne = event.target.value;
-        event.target.blur();
+        this.focusOn.focusControlOne = false;
       }
       if ((event.code === 'Escape') && event.target.name === 'Контролл 1') {
         this.controlOne = 0;
-        event.target.blur();
+        this.focusOn.focusControlOne = false;
       }
       if ((event.code === 'Enter' || event.code === 'NumpadEnter') && (event.target.name === 'Контролл 2' || event.target.name === 'Контролл 3')) {
         this.controlOther = event.target.value;
-        event.target.blur();
+        this.focusOn.focusControlTwo = false;
+        this.focusOn.focusControlTree = false;
       }
       if (event.code === 'Escape' && (event.target.name === 'Контролл 2' || event.target.name === 'Контролл 3')) {
         this.controlOther = 0;
-        event.target.blur();
+        this.focusOn.focusControlTwo = false;
+        this.focusOn.focusControlTree = false;
       }
     },
     unfocusForm(refData) {
@@ -180,13 +187,9 @@ export default {
         });
       }
     },
-    activeBlur(inElem, btnElem) {
-      console.log(inElem, btnElem, this.$refs.inControlOne);
-      console.log(inElem === 'inControlOne');
-      if (inElem === 'inControlOne') {
-        console.log('hello');
-        this.$refs.inControlOne.blur();
-      }
+    activeBlur(btnControl) {
+      console.log(btnControl);
+      this.$refs.inControlOne.blur();
     },
   },
 };
