@@ -12,14 +12,14 @@
                    type="number" min="0" step="1"
                    @input="updateControlOne"
                    v-model.number="controlOne" @keyup="keydown"
-                   @focus="focusOn.focusControlOne = true"
-            @blur="activeBlur('btnSum')">
+                   @focus="focusOn.focusControlOne = true">
           </div>
-          <button class="btn" ref="btnSum" @mouseup="totalSum" v-if="focusOn.focusControlOne">Сумма</button>
-          <div class="unfocus-form" @keydown="unfocusForm" @click="unfocusForm('inControlOne')"
+          <button class="btn" @mouseup="totalSum" v-if="focusOn.focusControlOne">Сумма</button>
+          <div class="unfocus-form" id="unfocusFormOne" @keydown="unfocusForm" @click="unfocusForm('inControlOne')"
                v-if="!focusOn.focusControlOne">
-            <p class="unfocus-text">{{ this.controlOne | numberFormat }}</p>
-            <svg class="unfocus-svg" width="6" height="6" viewBox="0 0 6 6" fill="none"
+            <p class="unfocus-text" id="zeroControlOne">{{ this.controlOne | numberFormat }}</p>
+            <svg class="unfocus-svg" id="svgControlOne" width="6" height="6" viewBox="0 0 6 6"
+                 fill="none"
                  xmlns="http://www.w3.org/2000/svg">
               <g clip-path="url(#clip0_2_85)">
                 <path
@@ -38,17 +38,19 @@
         <div class="group-elem">
           <p class="text">Контролл 2</p>
           <div v-show="focusOn.focusControlTwo">
-            <input class="input_style" ref="inControlTwo" name="Контролл 2" type="number" min="0"
+            <input class="input_style" ref="inControlTwo" name="Контролл 2"
+                   type="number" min="0" step="1"
                    @input="updateControlOther"
                    v-model.number="controlOther" @keyup="keydown"
-                   @blur="focusOn.focusControlTwo = false">
+                   @focus="focusOn.focusControlTwo = true">
           </div>
-          <button class="btn" @click="constantBtn" v-if="focusOn.focusControlTwo">Константа
+          <button class="btn" @mouseup="constantBtn" v-if="focusOn.focusControlTwo">Константа
           </button>
-          <div class="unfocus-form" @keydown="unfocusForm" @click="unfocusForm('inControlTwo')"
+          <div class="unfocus-form" id="unfocusFormTwo" @keydown="unfocusForm" @click="unfocusForm('inControlTwo')"
                v-if="!focusOn.focusControlTwo">
-            <p class="unfocus-text">{{ this.controlOther | numberFormat }}</p>
-            <svg class="unfocus-svg" width="6" height="6" viewBox="0 0 6 6" fill="none"
+            <p class="unfocus-text" id="zeroControlTwo">{{ this.controlOther | numberFormat }}</p>
+            <svg class="unfocus-svg" id="svgControlTwo" width="6" height="6" viewBox="0 0 6 6"
+                 fill="none"
                  xmlns="http://www.w3.org/2000/svg">
               <g clip-path="url(#clip0_2_85)">
                 <path
@@ -67,7 +69,8 @@
         <div class="group-elem">
           <p class="text">Контролл 3</p>
           <div v-show="focusOn.focusControlTree">
-            <input class="input_style" ref="inControlTree" name="Контролл 3" type="number" min="0"
+            <input class="input_style" ref="inControlTree" name="Контролл 3"
+                   type="number" min="0" step="1"
                    @input="updateControlOther"
                    v-model.number="controlOther" @keyup="keydown"
                    @focus="focusOn.focusControlTree = true"
@@ -113,9 +116,10 @@ export default {
         focusControlTwo: false,
         focusControlTree: false,
       },
-      btnClick: false,
-      blurOn: true,
     };
+  },
+  mounted() {
+    this.checkClick();
   },
   methods: {
     updateControlOne(input) {
@@ -136,15 +140,14 @@ export default {
       this.$store.commit('controlSum');
       this.controlOne = this.$store.state.controlSum;
       this.$refs.inControlOne.blur();
-      // this.focusOn.focusControlOne = false;
-      this.btnClick = true;
+      this.focusOn.focusControlOne = false;
     },
     constantBtn() {
       this.controlOther = 1000;
       this.$store.commit('updateStateControlOther', this.controlOther);
     },
     keydown(event) {
-      console.log(event);
+      console.log(event.code);
       if ((event.code === 'Enter' || event.code === 'NumpadEnter') && event.target.name === 'Контролл 1') {
         this.controlOne = event.target.value;
         this.focusOn.focusControlOne = false;
@@ -187,9 +190,20 @@ export default {
         });
       }
     },
-    activeBlur(btnControl) {
-      console.log(btnControl);
-      this.$refs.inControlOne.blur();
+    checkClick() {
+      document.addEventListener('click', (event) => {
+        const targetElement = event.target;
+        if (targetElement.name === 'Контролл 1' || targetElement.id === 'zeroControlOne' || targetElement.id === 'svgControlOne' || targetElement.id === 'unfocusFormOne') {
+          this.focusOn.focusControlOne = true;
+        } else {
+          this.focusOn.focusControlOne = false;
+        }
+        if (targetElement.name === 'Контролл 2' || targetElement.id === 'zeroControlTwo' || targetElement.id === 'svgControlTwo' || targetElement.id === 'unfocusFormTwo') {
+          this.focusOn.focusControlTwo = true;
+        } else {
+          this.focusOn.focusControlTwo = false;
+        }
+      });
     },
   },
 };
@@ -219,8 +233,6 @@ export default {
     height: 29px;
     margin-left: 188px;
     margin-top: 243px;
-    display: flex;
-    flex-wrap: wrap;
   }
 
   .group-elem {
@@ -253,6 +265,10 @@ export default {
     margin-left: 10px;
   }
 
+  .unfocus-form:hover {
+    color: #00467F;
+  }
+
   .unfocus-text {
     margin-top: 0px;
     margin-bottom: 0px;
@@ -279,10 +295,6 @@ export default {
 
   .input_style:focus {
     border: 1px #DDDDDD solid;
-  }
-
-  .input_style:hover {
-    color: #00467F;
   }
 
   .btn {
