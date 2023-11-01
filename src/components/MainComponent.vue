@@ -12,7 +12,9 @@
                    type="number" min="0" step="1"
                    @input="updateControlOne"
                    v-model.number="controlOne" @keyup="keydown"
-                   @focus="focusOn.focusControlOne = true">
+                   @focus="focusOnInput('inControlOne')"
+                   @keydown.exact.tab.prevent="unfocusForm('inControlTwo')"
+                   @keydown.shift.tab.prevent="unfocusForm('inControlTree')">
           </div>
           <button class="btn" @mouseup="totalSum" v-if="focusOn.focusControlOne">Сумма</button>
           <div class="unfocus-form" id="unfocusFormOne" @keydown="unfocusForm" @click="unfocusForm('inControlOne')"
@@ -42,7 +44,9 @@
                    type="number" min="0" step="1"
                    @input="updateControlOther"
                    v-model.number="controlOther" @keyup="keydown"
-                   @focus="focusOn.focusControlTwo = true">
+                   @focus="focusOnInput('inControlTwo')"
+                   @keydown.exact.tab.prevent="unfocusForm('inControlTree')"
+                   @keydown.shift.tab.prevent="unfocusForm('inControlOne')">
           </div>
           <button class="btn" @mouseup="constantBtn" v-if="focusOn.focusControlTwo">Константа
           </button>
@@ -73,8 +77,10 @@
                    type="number" min="0" step="1"
                    @input="updateControlOther"
                    v-model.number="controlOther" @keyup="keydown"
-                   @focus="focusOn.focusControlTree = true"
-                   @blur="focusOn.focusControlTree = false">
+                   @blur="focusOn.focusControlTree = false"
+                   @focus="focusOnInput('inControlTree')"
+                   @keydown.exact.tab.prevent="unfocusForm('inControlOne')"
+                   @keydown.shift.tab.prevent="unfocusForm('inControlTwo')">
           </div>
           <div class="unfocus-form" @keydown="unfocusForm" @click="unfocusForm('inControlTree')"
                v-if="!focusOn.focusControlTree">
@@ -111,6 +117,7 @@ export default {
       controlOne: 0,
       controlOther: 0,
       controlSum: 0,
+      focusIndex: null,
       focusOn: {
         focusControlOne: false,
         focusControlTwo: false,
@@ -122,6 +129,23 @@ export default {
     this.checkClick();
   },
   methods: {
+    focusOnInput(refData) {
+      if (refData === 'inControlOne') {
+        this.focusOn.focusControlOne = true;
+        this.focusOn.focusControlTwo = false;
+        this.focusOn.focusControlTree = false;
+      }
+      if (refData === 'inControlTwo') {
+        this.focusOn.focusControlTwo = true;
+        this.focusOn.focusControlOne = false;
+        this.focusOn.focusControlTree = false;
+      }
+      if (refData === 'inControlTree') {
+        this.focusOn.focusControlTree = true;
+        this.focusOn.focusControlOne = false;
+        this.focusOn.focusControlTwo = false;
+      }
+    },
     updateControlOne(input) {
       const { value } = input.target;
       if (value.includes('.') || value.includes('-')) {
@@ -147,7 +171,6 @@ export default {
       this.$store.commit('updateStateControlOther', this.controlOther);
     },
     keydown(event) {
-      console.log(event.code);
       if ((event.code === 'Enter' || event.code === 'NumpadEnter') && event.target.name === 'Контролл 1') {
         this.controlOne = event.target.value;
         this.focusOn.focusControlOne = false;
